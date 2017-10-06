@@ -1,4 +1,4 @@
-package com.github.readability4s
+package com.github.ghostdogpr.readability4s
 
 import java.net.URL
 import scala.collection.JavaConverters._
@@ -8,7 +8,7 @@ import scala.util.matching.Regex
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element, TextNode}
 import org.jsoup.select.Elements
-import com.github.readability4s.Readability._
+import Readability._
 
 // scalastyle:off cyclomatic.complexity
 // scalastyle:off method.length
