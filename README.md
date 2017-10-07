@@ -9,11 +9,11 @@ Scala version is 2.12.
 Import the project with Maven as follows:
 
 ```xml
-  <dependency>
-    <groupId>com.github.ghostdogpr</groupId>
-    <artifactId>readability4s</artifactId>
-    <version>1.0.2</version>
-  </dependency>
+<dependency>
+  <groupId>com.github.ghostdogpr</groupId>
+  <artifactId>readability4s</artifactId>
+  <version>1.0.2</version>
+</dependency>
 ```
 
 To parse a document, you must create a new `Readability` object from a URI string and an HTML string, and then call `parse()`. Here's an example:
