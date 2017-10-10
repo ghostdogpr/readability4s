@@ -12,7 +12,7 @@ Import the project with Maven as follows:
 <dependency>
   <groupId>com.github.ghostdogpr</groupId>
   <artifactId>readability4s</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 ```
 
