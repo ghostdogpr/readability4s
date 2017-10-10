@@ -522,7 +522,7 @@ case class Readability(uri: String, html: String) {
 
   private def toAbsoluteURI(uriToFix: String): String = {
     // If this is already an absolute URI, return it.
-    if ("^[a-zA-Z][a-zA-Z0-9\\+\\-\\.]*:".r.findFirstIn(uriToFix).isDefined) {
+    if ("^[a-zA-Z][a-zA-Z0-9\\+\\-\\.]*:".r.findFirstIn(uriToFix).isDefined || uriToFix.isEmpty) {
       uriToFix
     }
     // Scheme-rooted relative URI.
