@@ -527,7 +527,7 @@ case class Readability(uri: String, html: String) {
     }
     // Scheme-rooted relative URI.
     else if (uriToFix.take(2) == "//") {
-      scheme + "://" + uriToFix.take(2)
+      scheme + "://" + uriToFix.drop(2)
     }
     // Prepath-rooted relative URI.
     else if (uriToFix(0) == '/') {
@@ -535,7 +535,7 @@ case class Readability(uri: String, html: String) {
     }
     // Dotslash relative URI.
     else if (uriToFix.take(2) == "./") {
-      pathBase + uriToFix.take(2)
+      pathBase + uriToFix.drop(2)
     }
     // Ignore hash URIs:
     else if (uriToFix(0) == '#') {
