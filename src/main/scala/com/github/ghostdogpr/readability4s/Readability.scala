@@ -20,6 +20,8 @@ case class Readability(uri: String, html: String) {
   private var articleTitle: String = ""
   private var articleExcerpt: String = ""
   private var articleByline: String = ""
+  private var articleFavicon: String = ""
+  private var articleImage: String = ""
   private var flags = FLAG_STRIP_UNLIKELYS | FLAG_WEIGHT_CLASSES | FLAG_CLEAN_CONDITIONALLY
 
   private val uriObj = new URL(uri)
@@ -1141,6 +1143,9 @@ case class Readability(uri: String, html: String) {
       articleTitle = values.getOrElse("og:title",
         values.getOrElse("twitter:title", ""))
     }
+
+    articleFavicon = extractFaviconUrl(doc)
+    articleImage = extractImageUrl(doc)
   }
 
   // remove more than two spaces or newlines
@@ -1165,7 +1170,7 @@ case class Readability(uri: String, html: String) {
     toAbsoluteURI(faviconUrl)
   }
 
-  private def extractImageUrl(doc: Document, articleContent: Element): String = {
+  private def extractImageUrl(doc: Document): String = {
     var imageUrl = doc.select("head meta[property=og:image]").attr("content")
     if (imageUrl.isEmpty) {
       imageUrl = doc.select("head meta[name=twitter:image]").attr("content")
@@ -1175,10 +1180,6 @@ case class Readability(uri: String, html: String) {
     }
     if (imageUrl.isEmpty) {
       imageUrl = doc.select("head meta[name=thumbnail]").attr("content")
-    }
-    if (imageUrl.isEmpty) {
-      // if we could not find any image in the metadata, take the first from the article content
-      imageUrl = articleContent.getElementsByTag("img").attr("src")
     }
 
     toAbsoluteURI(imageUrl)
@@ -1220,6 +1221,11 @@ case class Readability(uri: String, html: String) {
 
         val textContent = articleContent.text
 
+        if (articleImage.isEmpty) {
+          // if we could not find any image in the metadata, take the first from the article content
+          articleImage = articleContent.getElementsByTag("img").attr("src")
+        }
+
         Article(uri,
           innerTrim(articleTitle),
           innerTrim(articleByline),
@@ -1227,8 +1233,8 @@ case class Readability(uri: String, html: String) {
           textContent,
           textContent.length,
           innerTrim(articleExcerpt),
-          extractFaviconUrl(doc),
-          extractImageUrl(doc, articleContent))
+          articleFavicon,
+          articleImage)
       })
     })
   }
