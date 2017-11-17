@@ -1196,47 +1196,51 @@ case class Readability(uri: String, html: String) {
     *  5. Read peacefully.
     **/
   def parse(): Option[Article] = {
-    Option(Jsoup.parse(html)).flatMap(doc => {
+    try {
+      Option(Jsoup.parse(html)).flatMap(doc => {
 
-      // Remove script tags from the document.
-      removeScripts(doc)
+        // Remove script tags from the document.
+        removeScripts(doc)
 
-      prepDocument(doc)
+        prepDocument(doc)
 
-      grabArticleMetadata(doc)
+        grabArticleMetadata(doc)
 
-      grabArticle(doc).map(articleContent => {
+        grabArticle(doc).map(articleContent => {
 
-        postProcessContent(articleContent)
+          postProcessContent(articleContent)
 
-        // If we haven't found an excerpt in the article's metadata, use the article's
-        // first paragraph as the excerpt. This is used for displaying a preview of
-        // the article's content.
-        if (articleExcerpt.isEmpty) {
-          val paragraphs = articleContent.getElementsByTag("p")
-          if (paragraphs.size > 0) {
-            articleExcerpt = paragraphs.first.text.trim
+          // If we haven't found an excerpt in the article's metadata, use the article's
+          // first paragraph as the excerpt. This is used for displaying a preview of
+          // the article's content.
+          if (articleExcerpt.isEmpty) {
+            val paragraphs = articleContent.getElementsByTag("p")
+            if (paragraphs.size > 0) {
+              articleExcerpt = paragraphs.first.text.trim
+            }
           }
-        }
 
-        val textContent = articleContent.text
+          val textContent = articleContent.text
 
-        if (articleImage.isEmpty) {
-          // if we could not find any image in the metadata, take the first from the article content
-          articleImage = articleContent.getElementsByTag("img").attr("src")
-        }
+          if (articleImage.isEmpty) {
+            // if we could not find any image in the metadata, take the first from the article content
+            articleImage = articleContent.getElementsByTag("img").attr("src")
+          }
 
-        Article(uri,
-          innerTrim(articleTitle),
-          innerTrim(articleByline),
-          articleContent.html,
-          textContent,
-          textContent.length,
-          innerTrim(articleExcerpt),
-          articleFavicon,
-          articleImage)
+          Article(uri,
+            innerTrim(articleTitle),
+            innerTrim(articleByline),
+            articleContent.html,
+            textContent,
+            textContent.length,
+            innerTrim(articleExcerpt),
+            articleFavicon,
+            articleImage)
+        })
       })
-    })
+    } catch {
+      case _: Exception => None
+    }
   }
 }
 
