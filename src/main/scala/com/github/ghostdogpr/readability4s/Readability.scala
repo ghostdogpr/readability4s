@@ -102,6 +102,7 @@ case class Readability(uri: String, html: String) {
                 val newNode = node.children.first
                 node.replaceWith(newNode)
                 node = newNode
+                elementsToScore :+= node
               } else if (!hasChildBlockElement(node)) {
                 node = node.tagName("P")
                 elementsToScore :+= node
@@ -462,6 +463,9 @@ case class Readability(uri: String, html: String) {
   private def postProcessContent(articleContent: Element): Unit = {
     // Readability cannot open relative uris so we convert them to absolute uris.
     fixRelativeUris(articleContent)
+
+    // Remove IDs and classes.
+    cleanIDsAndClasses(articleContent)
   }
 
   /**
@@ -495,6 +499,29 @@ case class Readability(uri: String, html: String) {
       currentNode = currentNode.parent
     }
     ancestors
+  }
+
+  /**
+    * Removes the id="" and class="" attribute from every element in the given
+    * subtree, except those that match IDS_TO_PRESERVE, CLASSES_TO_PRESERVE and
+    * the classesToPreserve array from the options object.
+    */
+  private def cleanIDsAndClasses(node: Element): Unit = {
+    if (!IDS_TO_PRESERVE.contains(node.id)) {
+      node.removeAttr("id")
+    }
+
+    val className = "\\s+".r.split(node.className)
+      .filter(CLASSES_TO_PRESERVE.contains)
+      .mkString(" ")
+
+    if (className.nonEmpty) {
+      node.classNames(Set(className).asJava)
+    } else {
+      node.removeAttr("class")
+    }
+
+    node.children.forEach(cleanIDsAndClasses)
   }
 
   /**
@@ -1287,6 +1314,10 @@ object Readability {
   private val DIV_TO_P_ELEMS = Seq("A", "BLOCKQUOTE", "DL", "DIV", "IMG", "OL", "P", "PRE", "TABLE", "UL", "SELECT")
 
   private val ALTER_TO_DIV_EXCEPTIONS = Seq("DIV", "ARTICLE", "SECTION", "P")
+
+  private val IDS_TO_PRESERVE = Seq("readability-content", "readability-page-1")
+
+  private val CLASSES_TO_PRESERVE = Seq("readability-styled", "page")
 
   private val FLAG_STRIP_UNLIKELYS: Int = 0x1
   private val FLAG_WEIGHT_CLASSES: Int = 0x2
