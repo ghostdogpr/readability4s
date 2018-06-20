@@ -1198,7 +1198,13 @@ case class Readability(uri: String, html: String) {
   }
 
   private def extractImageUrl(doc: Document): String = {
-    var imageUrl = doc.select("head meta[property=og:image]").attr("content")
+    var imageUrl = doc.select("head meta[property=og:image:secure_url]").attr("content")
+    if (imageUrl.isEmpty) {
+      imageUrl = doc.select("head meta[property=og:image:url]").attr("content")
+    }
+    if (imageUrl.isEmpty) {
+      imageUrl = doc.select("head meta[property=og:image]").attr("content")
+    }
     if (imageUrl.isEmpty) {
       imageUrl = doc.select("head meta[name=twitter:image]").attr("content")
     }
